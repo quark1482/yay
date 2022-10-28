@@ -12,25 +12,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS WebEngineCore)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network WebEngineCore)
 
-set(FFMPEG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vcpkg/packages/ffmpeg_x64-windows)
+find_package(FFmpeg REQUIRED COMPONENTS AVCODEC AVFORMAT AVUTIL)
 
-include_directories(${FFMPEG_DIR}/include)
-
-find_library(AVCODEC_LIBRARY NAMES avcodec HINTS ${FFMPEG_DIR}/lib)
-find_library(AVFORMAT_LIBRARY NAMES avformat HINTS ${FFMPEG_DIR}/lib)
-find_library(AVUTIL_LIBRARY NAMES avutil HINTS ${FFMPEG_DIR}/lib)
-
-if(${AVCODEC_LIBRARY} STREQUAL "AVCODEC_LIBRARY-NOTFOUND")
-    message(FATAL_ERROR "ffmpeg/avcodec library not found")
-elseif(${AVFORMAT_LIBRARY} STREQUAL "AVFORMAT_LIBRARY-NOTFOUND")
-    message(FATAL_ERROR "ffmpeg/avformat library not found")
-elseif(${AVUTIL_LIBRARY} STREQUAL "AVUTIL_LIBRARY-NOTFOUND")
-    message(FATAL_ERROR "ffmpeg/avutil library not found")
-endif()
+include_directories(${FFMPEG_INCLUDE_DIRS})
 
 add_subdirectory(src)
 

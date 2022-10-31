@@ -14,7 +14,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network WebEngineCore)
 
-find_package(FFmpeg REQUIRED COMPONENTS AVCODEC AVFORMAT AVUTIL)
+# Replaces find_package(FFmpeg) since it requires messing with the CMake cache.
+# FFmpeg was installed through vcpkg - modify the following route accordingly:
+include("../vcpkg/packages/ffmpeg_x64-windows/share/ffmpeg/FindFFMPEG.cmake")
 
 include_directories(${FFMPEG_INCLUDE_DIRS})
 
@@ -47,7 +49,7 @@ target_link_libraries(YAY
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
     PRIVATE Qt${QT_VERSION_MAJOR}::Network
     PRIVATE Qt${QT_VERSION_MAJOR}::WebEngineCore
-    PRIVATE ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY}
+    PRIVATE ${FFMPEG_LIBRARIES}
 )
 
 set_target_properties(YAY PROPERTIES

@@ -576,10 +576,9 @@ bool MainWindow::btnDownloadHandler(int     iMediaIndex,
  * @brief Splits a media file in multiple standalone clips of same duration.
  *
  * This method does not uses floating point at all. All the "time" parameters
- * are unsigned integers. Hence, even if the total duration is not a multiple
- * of the clip size, there is no need of calculating the size of the last clip
- * because AVTools::saveAs() stops at the exact last timestamp, no matter if
- * the supplied end timestamp is greater.
+ * are unsigned integers, even if AVTools::saveAs() supports fractions.
+ * The last clip will have the remaining seconds, when the total size is not
+ * a multiple of the clip size.
  * The clips are saved in the same folder the source media file is in.
  *
  * @note This method is far from perfect. There are cases where the obtained results
@@ -612,6 +611,12 @@ void MainWindow::createMultipleClips(QString sSourceMedia,
             // Creates de clips, starting from uiLeadingSize ...
             // ... and goes one uiClipSize at time.
             for(uiK=0,uiNdx=0;uiK<uiSourceSize;uiK+=uiClipSize) {
+                uint uiA=uiK+uiLeadingSize,
+                     uiB=uiA+uiClipSize;
+                // Adjusts the clip's upper limit in case it ...
+                // ... ends beyond the required range.
+                if(uiB>uiSourceSize+uiLeadingSize)
+                    uiB=uiSourceSize+uiLeadingSize;
                 sTargetClip=QStringLiteral("%1/%2.%3.%4").
                             arg(
                                 fiTarget.absolutePath(),
@@ -622,8 +627,8 @@ void MainWindow::createMultipleClips(QString sSourceMedia,
                 bSuccess=avtClipper.saveAs(
                     sSourceMedia,
                     sTargetClip,
-                    uiK+uiLeadingSize,
-                    uiK+uiLeadingSize+uiClipSize
+                    uiA,
+                    uiB
                 );
                 ui->txtLog->appendPlainText(
                     QStringLiteral("%1 ... %2").
